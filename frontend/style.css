@@ -110,6 +110,27 @@ body {
     background: var(--accent-green);
 }
 
+.action-btn {
+    background: var(--button-off);
+    border: 1px solid #000;
+    color: var(--text-color);
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.1s;
+}
+
+.action-btn:active {
+    background: var(--accent-green);
+    color: #000;
+    box-shadow: 0 0 10px var(--accent-green);
+    transform: translateY(1px);
+}
+
 .power-button {
     width: 40px;
     height: 40px;

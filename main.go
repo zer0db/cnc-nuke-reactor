@@ -83,6 +83,8 @@ func main() {
 			sim.Scram()
 		case "toggleAuto":
 			sim.ToggleAuto()
+		case "refuel":
+			sim.Refuel()
 		case "setFissionRate":
 			sim.SetFissionRate(payload.Value)
 		case "setTurbineOutput":

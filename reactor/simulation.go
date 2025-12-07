@@ -222,6 +222,13 @@ func (r *Reactor) Snapshot() ReactorState {
 	return r.state
 }
 
+func (r *Reactor) Refuel() {
+	r.Lock()
+	defer r.Unlock()
+	// Replace with a fresh fuel rod at 100% condition
+	r.state.FuelRod = &FuelRod{Condition: 100}
+}
+
 // Internal helpers
 func min(a, b float64) float64 {
 	if a < b {

@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ui = {
         reactorPanel: document.querySelector('.reactor-panel'),
         powerButton: document.getElementById('power-button'),
+        refuelButton: document.getElementById('refuel-button'),
         autoSwitch: document.getElementById('auto-control-switch'),
         fissionNeedle: document.querySelector('#fission-rate-gauge .gauge-needle'),
         fissionValue: document.getElementById('fission-rate-value'),
@@ -152,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!state) return;
         sendAction(state.isPoweredOn ? 'powerOff' : 'powerOn');
     });
+    ui.refuelButton.addEventListener('click', () => sendAction('refuel'));
     ui.autoSwitch.addEventListener('click', () => sendAction('toggleAuto'));
     // throttle slider sends
     let fissionTimer = null;
