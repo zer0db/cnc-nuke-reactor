@@ -159,7 +159,9 @@ func (r *Reactor) updateStatusLocked() {
 	// preserve scram
 	current := r.state.Status & StatusScram
 
-	if r.state.Temperature >= r.MELTDOWN_TEMP {
+	if r.state.Temperature >= (r.MELTDOWN_TEMP * 1.3) {
+		current |= StatusScram
+	} else if r.state.Temperature >= r.MELTDOWN_TEMP {
 		current |= StatusMeltdown
 	} else if r.state.Temperature >= r.OVERHEAT_TEMP {
 		current |= StatusOverheat
