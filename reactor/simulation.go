@@ -79,7 +79,7 @@ func NewReactor() *Reactor {
 	initialLoad := 1000.0
 	r.baseLoad = initialLoad
 	r.spikeTimer = 10.0 // First spike in ~10 seconds (simulated time)
-	r.spikeDuration = 10.0
+	r.spikeDuration = 3.0
 	r.spikeMagnitude = 1000.0
 	initialTemp := r.OPTIMAL_TEMP
 	initialTurbine := initialLoad / (initialTemp / 100.0 * (initialTemp / r.OVERHEAT_TEMP) * r.TURBINE_POWER_FACTOR)
