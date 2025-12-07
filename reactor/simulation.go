@@ -1,6 +1,8 @@
 package reactor
 
 import (
+	"math"
+	"math/rand"
 	"sync"
 )
 
@@ -51,6 +53,12 @@ type Reactor struct {
 	AMBIENT_TEMP_DISSIPATION float64
 	TURBINE_POWER_FACTOR     float64
 	LOW_FUEL_THRESHOLD       float64
+	baseLoad                 float64
+	spikeTimer               float64 // Counts down to next spike
+	isSpiking                bool
+	spikeElapsed             float64
+	spikeDuration            float64
+	spikeMagnitude           float64
 }
 
 func NewReactor() *Reactor {
@@ -69,6 +77,10 @@ func NewReactor() *Reactor {
 	}
 
 	initialLoad := 1000.0
+	r.baseLoad = initialLoad
+	r.spikeTimer = 10.0 // First spike in ~10 seconds (simulated time)
+	r.spikeDuration = 10.0
+	r.spikeMagnitude = 1000.0
 	initialTemp := r.OPTIMAL_TEMP
 	initialTurbine := initialLoad / (initialTemp / 100.0 * (initialTemp / r.OVERHEAT_TEMP) * r.TURBINE_POWER_FACTOR)
 	heatConsumed := (initialLoad / r.TURBINE_POWER_FACTOR) + (initialTemp * r.AMBIENT_TEMP_DISSIPATION)
@@ -92,6 +104,7 @@ func (r *Reactor) Update(delta float64) {
 	r.Lock()
 	defer r.Unlock()
 
+	r.updateGridLoad(delta)
 	if !r.state.IsPoweredOn || (r.state.Status&StatusScram) != 0 {
 		// shutdown cooling behaviour
 		r.state.FissionRate = 0
@@ -169,6 +182,38 @@ func (r *Reactor) updateStatusLocked() {
 		current |= StatusFuelLow
 	}
 	r.state.Status = current
+}
+
+func (r *Reactor) updateGridLoad(delta float64) {
+	// 1. Random Walk for Base Load
+	// Change ~ +/- 12 per tick.
+	change := (rand.Float64() * 24) - 12
+	r.baseLoad += change
+	r.baseLoad = clamp(r.baseLoad, 800, 2100)
+
+	// 2. Spike Logic
+	spikeVal := 0.0
+
+	if !r.isSpiking {
+		r.spikeTimer -= delta
+		if r.spikeTimer <= 0 {
+			r.isSpiking = true
+			r.spikeElapsed = 0
+			// Schedule next spike 10-15s after this one finishes
+			r.spikeTimer = 10.0 + rand.Float64()*5.0
+		}
+	} else {
+		r.spikeElapsed += delta
+		if r.spikeElapsed >= r.spikeDuration {
+			r.isSpiking = false
+		} else {
+			// Linear decay: magnitude * (1 - progress)
+			decayFactor := 1.0 - (r.spikeElapsed / r.spikeDuration)
+			spikeVal = r.spikeMagnitude * decayFactor
+		}
+	}
+
+	r.state.PowerLoad = math.Round(r.baseLoad + spikeVal)
 }
 
 // Control helpers

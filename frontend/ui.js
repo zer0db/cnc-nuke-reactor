@@ -195,8 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
         state = newState;
         // ensure sliders/controls reflect current server state
         if (state) {
-            ui.fissionSlider.value = state.fissionRate;
-            ui.turbineSlider.value = state.turbineOutput;
+            // ui.fissionSlider.value = state.fissionRate;
+            // ui.turbineSlider.value = state.turbineOutput;
             populateScales();
         }
         updateUI(state);
@@ -239,36 +239,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const deltaTime = (currentTime - lastTime) / 1000;
         lastTime = currentTime;
 
-        // Baseline load random walk
-        const loadDelta = Math.floor(Math.random() * 25) - 12;
-        baseLoad += loadDelta;
-        if (baseLoad > 2200) baseLoad = 2100;
-        if (baseLoad < 750) baseLoad = 800;
+        // // Baseline load random walk
+        // const loadDelta = Math.floor(Math.random() * 25) - 12;
+        // baseLoad += loadDelta;
+        // if (baseLoad > 2200) baseLoad = 2100;
+        // if (baseLoad < 750) baseLoad = 800;
 
-        // Spike logic
-        let spikeValue = 0;
-        if (!spikeState.isActive && currentTime >= spikeState.nextSpikeTime) {
-            spikeState.isActive = true;
-            spikeState.startTime = currentTime;
-            scheduleNextSpike(currentTime);
-        }
-        if (spikeState.isActive) {
-            const elapsed = currentTime - spikeState.startTime;
-            if (elapsed >= spikeState.duration) {
-                spikeState.isActive = false;
-            } else {
-                const decayFactor = 1 - (elapsed / spikeState.duration);
-                spikeValue = spikeState.magnitude * decayFactor;
-            }
-        }
+        // // Spike logic
+        // let spikeValue = 0;
+        // if (!spikeState.isActive && currentTime >= spikeState.nextSpikeTime) {
+        //     spikeState.isActive = true;
+        //     spikeState.startTime = currentTime;
+        //     scheduleNextSpike(currentTime);
+        // }
+        // if (spikeState.isActive) {
+        //     const elapsed = currentTime - spikeState.startTime;
+        //     if (elapsed >= spikeState.duration) {
+        //         spikeState.isActive = false;
+        //     } else {
+        //         const decayFactor = 1 - (elapsed / spikeState.duration);
+        //         spikeValue = spikeState.magnitude * decayFactor;
+        //     }
+        // }
 
-        const finalLoad = Math.round(baseLoad + spikeValue);
+        // const finalLoad = Math.round(baseLoad + spikeValue);
 
-        // send to backend only when changed sufficiently
-        if (Math.abs(finalLoad - lastSentLoad) > 1) {
-            sendAction('setPowerLoad', finalLoad);
-            lastSentLoad = finalLoad;
-        }
+        // // send to backend only when changed sufficiently
+        // if (Math.abs(finalLoad - lastSentLoad) > 1) {
+        //     sendAction('setPowerLoad', finalLoad);
+        //     lastSentLoad = finalLoad;
+        // }
 
         // animate wobble even if we wait for SSE for numeric updates
         animateAndDraw();
@@ -300,13 +300,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Math.abs(turbineWobble) < 0.1) turbineWobble = 0;
 
         ui.fissionNeedle.style.transform = `rotate(${-90 + st.fissionRate * 1.8 + currentFissionWobble}deg)`;
-        ui.fissionValue.textContent = st.fissionRate.toFixed(0);
-        ui.fissionSlider.value = st.fissionRate;
+        if (document.activeElement !== ui.fissionSlider) {
+             ui.fissionValue.textContent = st.fissionRate.toFixed(0);
+             ui.fissionSlider.value = st.fissionRate;
+        }
         ui.fissionSlider.disabled = st.isAutoControl;
 
         ui.turbineNeedle.style.transform = `rotate(${-90 + st.turbineOutput * 1.8 + currentTurbineWobble}deg)`;
-        ui.turbineValue.textContent = st.turbineOutput.toFixed(0);
-        ui.turbineSlider.value = st.turbineOutput;
+        if (document.activeElement !== ui.turbineSlider) {
+            ui.turbineValue.textContent = st.turbineOutput.toFixed(0);
+            ui.turbineSlider.value = st.turbineOutput;
+        }
         ui.turbineSlider.disabled = st.isAutoControl;
 
         lastFissionRate = st.fissionRate;
