@@ -1,0 +1,390 @@
+:root {
+    --panel-bg: #1a2a2a;
+    --panel-border: #4a5a5a;
+    --screen-bg: #0a1414;
+    --text-color: #a0f0c0;
+    --text-dark: #60a080;
+    --gauge-bg: #101818;
+    --gauge-border: #333;
+    --needle-color: #ff4d4d;
+    --accent-red: #ff3b3b;
+    --accent-yellow: #f0d040;
+    --accent-green: #33ff88;
+    --accent-blue: #3b9eff;
+    --button-off: #3d4c4c;
+    --button-on: #ff4d4d;
+}
+
+body {
+    font-family: 'Roboto Condensed', sans-serif;
+    background-image: url('https://raw.githubusercontent.com/zer0db/zer0db.github.io/refs/heads/main/nuke-reactor/reactor-bg.jpg');
+    background-size: cover;
+    background-color: #050808;
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none;
+}
+
+.reactor-panel {
+    width: 100%;
+    max-width: 1000px;
+    background: linear-gradient(180deg, #283838, #182424);
+    border: 2px solid var(--panel-border);
+    border-radius: 15px;
+    padding: 1rem;
+    box-shadow: 0 0 30px rgba(0, 255, 200, 0.1), inset 0 0 10px rgba(0,0,0,0.5);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 1rem;
+    grid-template-areas:
+        "header header"
+        "gauges status"
+        "warnings warnings";
+}
+
+/* --- Header --- */
+.panel-header {
+    grid-area: header;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+
+.header-warnings { display: flex; gap: 0.5rem; }
+
+.warning-light {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #000;
+    border-radius: 5px;
+    background-color: var(--button-off);
+    color: rgba(255,255,255,0.4);
+    text-shadow: 1px 1px 2px #000;
+    transition: all 0.2s;
+}
+.warning-light.active {
+     background-color: var(--accent-red);
+     color: #fff;
+     box-shadow: 0 0 10px var(--accent-red);
+}
+
+.main-controls { display: flex; align-items: center; gap: 1rem; }
+.control-switch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.switch-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-dark); }
+.switch {
+    width: 50px;
+    height: 25px;
+    background: var(--button-off);
+    border-radius: 25px;
+    border: 1px solid #000;
+    position: relative;
+    cursor: pointer;
+}
+.switch-knob {
+    position: absolute;
+    width: 21px;
+    height: 21px;
+    background: #ccc;
+    border-radius: 50%;
+    top: 1px;
+    left: 2px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: inset 0 -2px 3px rgba(0,0,0,0.4);
+}
+.switch.on .switch-knob {
+    left: 26px;
+    background: var(--accent-green);
+}
+
+.power-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    background: var(--button-off);
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+}
+.power-button.on {
+    background-color: var(--button-on);
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+.power-button-label { font-size: 0.7rem; color: var(--text-dark); }
+
+
+/* --- Gauges --- */
+.gauges-container { grid-area: gauges; display: flex; gap: 1rem; justify-content: space-around; }
+
+.gauge {
+    width: 250px;
+    height: 220px;
+    background-color: var(--gauge-bg);
+    border: 2px solid var(--gauge-border);
+    border-radius: 10px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.gauge-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+.gauge-body {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    overflow: hidden;
+}
+.gauge-face {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 2px solid var(--gauge-border);
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+}
+
+.gauge-needle {
+    position: absolute;
+    width: 2px;
+    height: 80px;
+    background-color: var(--needle-color);
+    bottom: 0px;
+    left: 99px;
+    transform-origin: bottom center;
+    transition: transform 0.1s linear;
+    z-index: 10;
+}
+.gauge-needle-hub {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #555;
+    border-radius: 50%;
+    bottom: -5px;
+    left: 95px;
+    z-index: 11;
+}
+.gauge-ticks {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+.tick-label {
+    position: absolute;
+    color: var(--text-color);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* --- Custom Slider Styles --- */
+.gauge-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 80%;
+    height: 8px;
+    background: #000;
+    border: 1px solid var(--gauge-border);
+    border-radius: 5px;
+    outline: none;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.gauge-slider:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Webkit (Chrome, Safari) */
+.gauge-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: #000;
+    border-radius: 5px;
+    border: 1px solid var(--gauge-border);
+}
+
+.gauge-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 25px;
+    background: linear-gradient(180deg, #ccc, #888);
+    border: 1px solid #333;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: -9px; /* Adjust to center vertically */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Mozilla (Firefox) */
+.gauge-slider::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: #000;
+    border-radius: 5px;
+    border: 1px solid var(--gauge-border);
+}
+
+.gauge-slider::-moz-range-thumb {
+    width: 15px;
+    height: 25px;
+    background: linear-gradient(180deg, #ccc, #888);
+    border: 1px solid #333;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+
+/* --- Status Display --- */
+.status-display {
+    grid-area: status;
+    display: flex;
+    flex-direction: column;
+    background: var(--screen-bg);
+    border: 2px solid var(--gauge-border);
+    border-radius: 10px;
+    padding: 1rem;
+}
+.power-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+}
+#graph-wrapper {
+    flex-grow: 1;
+    display: flex;
+    margin: 0.5rem 0;
+    gap: 0.5rem;
+}
+.graph-scale {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    color: var(--text-dark);
+}
+.graph-scale.left { text-align: left; color: red; }
+.graph-scale.right { text-align: right; }
+
+#graph-container {
+    flex-grow: 1;
+    background: #000;
+    border-radius: 5px;
+    position: relative; /* Needed for tooltip positioning */
+}
+#history-graph {
+    width: 100%;
+    height: 100%;
+}
+
+.tooltip {
+    position: absolute;
+    display: none;
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid var(--panel-border);
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 0.8rem;
+    color: var(--text-color);
+    pointer-events: none; /* Prevents the tooltip from interfering with mouse events */
+}
+
+
+/* --- Refactored Label Styles --- */
+.power-info .label.temp-label {
+    color: var(--accent-yellow);
+}
+
+.power-info .label.load-label {
+    color: var(--accent-blue);
+}
+
+.power-info .label.output-label {
+    color: var(--accent-green);
+}
+
+
+/* --- Warning Lights --- */
+.warnings-grid {
+    grid-area: warnings;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    background: rgba(0,0,0,0.2);
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+.status-light {
+    background-color: #111;
+    border: 2px solid #000;
+    color: #555;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+.status-light.active.temp-low { background-color: var(--accent-blue); color: #fff; box-shadow: 0 0 10px var(--accent-blue); }
+.status-light.active.overheat { background-color: var(--accent-yellow); color: #000; box-shadow: 0 0 10px var(--accent-yellow); }
+.status-light.active.output-low, .status-light.active.output-high { background-color: var(--accent-yellow); color: #000; box-shadow: 0 0 10px var(--accent-yellow); }
+.status-light.active.fuel-low { background-color: var(--accent-yellow); color: #000; box-shadow: 0 0 10px var(--accent-yellow); }
+.status-light.active.fuel-out { background-color: var(--accent-red); color: #fff; box-shadow: 0 0 10px var(--accent-red); }
+.status-light.active.meltdown { background-color: var(--accent-red); color: #fff; box-shadow: 0 0 20px #ff0000, inset 0 0 10px #fff; animation: blink 0.5s infinite; }
+.status-light.active.scram { background-color: var(--accent-red); color: #fff; box-shadow: 0 0 10px var(--accent-red); }
+
+@keyframes blink {
+    50% { opacity: 0.5; }
+}
+
+/* --- Added Animations --- */
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 15px var(--button-on); }
+    50% { box-shadow: 0 0 30px var(--button-on), 0 0 10px #ffc1c1; }
+    100% { box-shadow: 0 0 15px var(--button-on); }
+}
+
+@keyframes screen-shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake {
+    animation: screen-shake 0.5s infinite;
+}
