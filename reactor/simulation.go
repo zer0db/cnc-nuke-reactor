@@ -185,9 +185,9 @@ func (r *Reactor) updateStatusLocked() {
 }
 
 func (r *Reactor) updateGridLoad(delta float64) {
-	// Suspend load simulation if output is 0
-	if r.state.PowerOutput <= 0 {
-		r.state.PowerLoad = 0
+	// Suspend load simulation if output falls below 10
+	if r.state.PowerOutput < 10 {
+		r.state.PowerLoad = 10
 		return
 	}
 	// 1. Random Walk for Base Load
