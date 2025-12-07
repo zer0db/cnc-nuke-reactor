@@ -142,7 +142,7 @@ func main() {
 	}
 	http.Handle("/", http.FileServer(http.Dir(staticDir)))
 
-	port := 8880
+	port := 80
 	log.Printf("server listening :%d (static: %s)\n", port, staticDir)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), nil))
 }
